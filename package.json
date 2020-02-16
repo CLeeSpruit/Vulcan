@@ -21,7 +21,6 @@
 	},
 	"dependencies": {
 		"configstore": "^5.0.1",
-		"meow": "^6.0.1",
-		"node-persist": "^3.0.5"
+		"meow": "^6.0.1"
 	}
 }
