@@ -15,6 +15,10 @@ class TemplateManager {
 		return {};
 	}
 
+	getTemplate(templateName) {
+		return this.storage.get(`${this.templateKey}.${templateName}`);
+	}
+
 	createTemplate(template) {
 		if (!this.storage.has(`${this.templateKey}.${template.name}`)) {
 			this.storage.set(`${this.templateKey}.${template.name}`, template);
@@ -25,8 +29,8 @@ class TemplateManager {
 		return this.storage.has(`${this.templateKey}.${templateName}`);
 	}
 
-	deleteTemplate(template) {
-		this.storage.delete(`${this.templateKey}.${template.name}`);
+	deleteTemplate(templateName) {
+		this.storage.delete(`${this.templateKey}.${templateName}`);
 	}
 }
 

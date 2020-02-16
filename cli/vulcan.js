@@ -5,6 +5,7 @@ const generate = require('./generate');
 const updateTemplate = require('./update-template');
 const update = require('./update');
 const register = require('./register');
+const linkTemplate = require('./link');
 
 function vulcan(cli) {
 	const command = cli.input[0];
@@ -13,13 +14,23 @@ function vulcan(cli) {
 
 	switch (command) {
 		case 'generate':
+			if (!templateName) {
+				return cli.showHelp();
+			}
+
+			if (cli.pkg) {
+				console.log('Error generating template: package.json already exists.');
+			}
+
 			return generate(tmplMan, templateName);
 		case 'register':
-			return register(tmplMan, templateName);
+			return register(tmplMan, cli.pkg);
 		case 'create':
 			return create(tmplMan, templateName);
 		case 'delete':
 			return deleteTemplate(tmplMan, templateName);
+		case 'link':
+			return linkTemplate(tmplMan, cli.pkg, templateName);
 		case 'list':
 			console.log('Registered Templates:');
 			console.log(Object.keys(tmplMan.getTemplates()).join('\n'));
