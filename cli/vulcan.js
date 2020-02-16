@@ -1,3 +1,4 @@
+const fs = require('fs');
 const TemplateManager = require('./template-manager');
 const create = require('./create');
 const deleteTemplate = require('./delete');
@@ -7,7 +8,7 @@ const update = require('./update');
 const register = require('./register');
 const linkTemplate = require('./link');
 
-function vulcan(cli) {
+async function vulcan(cli) {
 	const command = cli.input[0];
 	const templateName = cli.input[1];
 	const tmplMan = new TemplateManager();
@@ -24,11 +25,15 @@ function vulcan(cli) {
 
 			return generate(tmplMan, templateName);
 		case 'register':
-			return register(tmplMan, cli.pkg);
+			await register(tmplMan);
+			break;
 		case 'create':
 			return create(tmplMan, templateName);
 		case 'delete':
 			return deleteTemplate(tmplMan, templateName);
+		case 'clear':
+			tmplMan.clear();
+			break;
 		case 'link':
 			return linkTemplate(tmplMan, cli.pkg, templateName);
 		case 'list':

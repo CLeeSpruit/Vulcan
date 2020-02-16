@@ -32,6 +32,10 @@ class TemplateManager {
 	deleteTemplate(templateName) {
 		this.storage.delete(`${this.templateKey}.${templateName}`);
 	}
+
+	clear() {
+		this.storage.clear();
+	}
 }
 
 module.exports = TemplateManager;
