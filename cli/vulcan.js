@@ -1,4 +1,3 @@
-const fs = require('fs');
 const TemplateManager = require('./template-manager');
 const create = require('./create');
 const deleteTemplate = require('./delete');
@@ -7,6 +6,7 @@ const updateTemplate = require('./update-template');
 const update = require('./update');
 const register = require('./register');
 const linkTemplate = require('./link');
+const {list, view} = require('./list');
 
 async function vulcan(cli) {
 	const command = cli.input[0];
@@ -19,27 +19,25 @@ async function vulcan(cli) {
 				return cli.showHelp();
 			}
 
-			if (cli.pkg) {
-				console.log('Error generating template: package.json already exists.');
-			}
-
 			return generate(tmplMan, templateName);
 		case 'register':
-			await register(tmplMan);
-			break;
+			return register(tmplMan);
 		case 'create':
 			return create(tmplMan, templateName);
 		case 'delete':
 			return deleteTemplate(tmplMan, templateName);
 		case 'clear':
-			tmplMan.clear();
-			break;
+			return tmplMan.clear();
 		case 'link':
 			return linkTemplate(tmplMan, cli.pkg, templateName);
 		case 'list':
-			console.log('Registered Templates:');
-			console.log(Object.keys(tmplMan.getTemplates()).join('\n'));
-			break;
+			return list(tmplMan);
+		case 'view':
+			if (!templateName) {
+				return list(tmplMan);
+			}
+
+			return view(tmplMan, templateName);
 		case 'update':
 			if (templateName) {
 				return updateTemplate(tmplMan, templateName);

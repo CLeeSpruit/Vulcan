@@ -1,4 +1,4 @@
-const {getPackageJSON} = require('./package');
+const {getPackageJSON} = require('./files');
 
 async function register(tmplMan) {
 	const pkgJson = await getPackageJSON();
