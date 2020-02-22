@@ -2,9 +2,20 @@
 	"name": "@cspruit/vulcan",
 	"version": "0.1.0",
 	"description": "A boilerplate creator and maintainer",
+	"bin": {
+		"vulcan": "cli/cli.js"
+	},
 	"scripts": {
 		"test": "echo 'No tests yet'"
 	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CassandraSpruit/Vulcan.git"
+	},
+	"bugs": {
+		"url": "https://github.com/CassandraSpruit/Vulcan/issues"
+	},
+	"homepage": "https://github.com/CassandraSpruit/Vulcan#readme",
 	"keywords": [
 		"boilerplate",
 		"generator",
@@ -15,9 +26,6 @@
 	],
 	"author": "Cassandra Spruit",
 	"license": "GPL-3.0-or-later",
-	"bin": {
-		"vulcan": "cli/cli.js"
-	},
 	"dependencies": {
 		"configstore": "^5.0.1",
 		"fs-extra": "^8.1.0",
