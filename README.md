@@ -60,7 +60,7 @@ In order to start generatating boilerplate code, a template needs to be created 
 ```
 
 ## List of Vulcan Templates
-- (TBD)
+- **[CLI Utility](https://github.com/CassandraSpruit/Vulcan-Cli-Utility)** : Generates a very basic node.js CLI utility app
 
 ## Contributing
 All contributions, suggestions, and issues are welcome!
