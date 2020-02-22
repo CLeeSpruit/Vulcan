@@ -1,10 +1,9 @@
 {
-	"name": "vulcan",
-	"version": "1.0.0",
+	"name": "@cspruit/vulcan",
+	"version": "0.1.0",
 	"description": "A boilerplate creator and maintainer",
-	"main": "vulcan.js",
 	"scripts": {
-		"test": "ava"
+		"test": "echo 'No tests yet'"
 	},
 	"keywords": [
 		"boilerplate",
