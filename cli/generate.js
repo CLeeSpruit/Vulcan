@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const {getPackageJSON, copyTemplateFiles} = require('./files');
+const {getPackageJSON, parseTemplateFiles} = require('./files');
 
 async function generate(tmplMan, templateName) {
 	const template = tmplMan.getTemplate(templateName);
@@ -19,11 +19,11 @@ async function generate(tmplMan, templateName) {
 	const data = templatePkg.vulcan.fields;
 
 	const answers = await askQuestions(data) || {};
-	console.log('answers', answers);
 
-	// Copy Files over
-	// await copyTemplateFiles(template.location);
-	console.log('Files successfully transfered. Happy coding!');
+	// Copy files into current directory and parse them
+	await parseTemplateFiles(template.location, answers);
+
+	console.log(`${templateName} successfully created. Happy coding!`);
 }
 
 async function askQuestions(data) {
