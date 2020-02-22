@@ -1,10 +1,14 @@
 const path = require('path');
 const fs = require('fs-extra');
 
-async function getPackageJSON() {
+async function getPackageJSON(location) {
+	if (!location) {
+		location = process.cwd();
+	}
+
 	let data;
 	try {
-		data = await fs.promises.readFile(path.join(process.cwd(), 'package.json'), 'utf-8');
+		data = await fs.promises.readFile(path.join(location, 'package.json'), 'utf-8');
 	} catch (error) {
 		if (error && error.code !== 'ENOENT') {
 			return null;
@@ -19,6 +23,10 @@ async function getPackageJSON() {
 		console.log('Error trying to parse package.json');
 		console.error(error);
 	}
+}
+
+async function parseTemplateFiles() {
+	//
 }
 
 async function copyTemplateFiles(location) {
