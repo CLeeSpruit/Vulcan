@@ -34,14 +34,15 @@ async function parseTemplateFiles(location, answers) {
 async function parseDirectory(baseLocation, currentPath, answers) {
 	const currentTemplateLocation = path.join(baseLocation, currentPath);
 	const currentCopyLocation = path.join(process.cwd(), currentPath);
+	const parsedCurrentCopyLocation = handlebars.compile(currentCopyLocation)(answers);
 	// Copy directory location over if it doesn't exist already
 	try {
-		await fs.promises.stat(currentCopyLocation);
-		console.log(`Skipped: ${currentPath}`);
+		await fs.promises.stat(parsedCurrentCopyLocation);
+		console.log(`Skipped: ${parsedCurrentCopyLocation}`);
 	} catch {
 		// Create directory since it doesn't exist
-		await fs.promises.mkdir(currentCopyLocation);
-		console.log(`Created: ${currentPath}`);
+		await fs.promises.mkdir(parsedCurrentCopyLocation);
+		console.log(`Created: ${parsedCurrentCopyLocation}`);
 	}
 
 	// Read directory
@@ -64,7 +65,8 @@ async function parseDirectory(baseLocation, currentPath, answers) {
 
 			// Create file in directory
 			const copyLocation = path.join(process.cwd(), filePath);
-			await fs.promises.writeFile(copyLocation, parsed, {flag: 'w'});
+			const parsedCopyLocation = handlebars.compile(copyLocation)(answers);
+			await fs.promises.writeFile(parsedCopyLocation, parsed, {flag: 'w'});
 			console.log(`Copied: ${filePath}`);
 		}
 	});
