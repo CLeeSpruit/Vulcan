@@ -6,6 +6,8 @@
 		"vulcan": "cli/cli.js"
 	},
 	"scripts": {
+		"lint": "xo",
+		"lint-fix": "xo --fix",
 		"test": "echo 'No tests yet'"
 	},
 	"repository": {
@@ -26,6 +28,9 @@
 	],
 	"author": "Cassandra Spruit",
 	"license": "GPL-3.0-or-later",
+	"devDependencies": {
+		"xo": "0.26.1"
+	},
 	"dependencies": {
 		"configstore": "^5.0.1",
 		"fs-extra": "^8.1.0",
