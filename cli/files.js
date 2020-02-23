@@ -29,26 +29,25 @@ async function getPackageJSON(location) {
 
 async function parseTemplateFiles(location, answers, config) {
 	// Recursively read each of the files in this directory and insert handlebars
-	await parseDirectory(location, './', answers, config);
+	await parseDirectory({baseLocation: location, currentPath: './', parsedPath: './'}, answers, config);
 }
 
-async function parseDirectory(baseLocation, currentPath, answers, config) {
+async function parseDirectory(pathInfo, answers, config) {
 	// Check if this path has been white/blacklisted
-	if (!includeTest(config, currentPath)) {
+	if (!includeTest(config, pathInfo.parsedPath)) {
 		return;
 	}
 
-	const currentTemplateLocation = path.join(baseLocation, currentPath);
-	const currentCopyLocation = path.join(process.cwd(), currentPath);
-	const parsedCurrentCopyLocation = handlebars.compile(currentCopyLocation)(answers);
+	const currentTemplateLocation = path.join(pathInfo.baseLocation, pathInfo.currentPath);
+	const currentCopyLocation = path.join(process.cwd(), pathInfo.parsedPath);
 	// Copy directory location over if it doesn't exist already
 	try {
-		await fs.promises.stat(parsedCurrentCopyLocation);
-		console.log(`Skipped: ${parsedCurrentCopyLocation}`);
+		await fs.promises.stat(currentCopyLocation);
+		console.log(`Skipped: ${currentCopyLocation}`);
 	} catch {
 		// Create directory since it doesn't exist
-		await fs.promises.mkdir(parsedCurrentCopyLocation);
-		console.log(`Created: ${parsedCurrentCopyLocation}`);
+		await fs.promises.mkdir(currentCopyLocation);
+		console.log(`Created: ${currentCopyLocation}`);
 	}
 
 	// Read directory
@@ -59,26 +58,28 @@ async function parseDirectory(baseLocation, currentPath, answers, config) {
 
 	// Loop through directory files
 	files.forEach(async file => {
+		const parsedFileName = handlebars.compile(file)(answers);
 		// Check if file is white/blacklisted
-		const filePath = path.join(currentPath, file);
-		if (!includeTest(config, filePath)) {
+		const filePath = path.join(pathInfo.currentPath, file);
+		const parsedFilePath = path.join(pathInfo.parsedPath, parsedFileName);
+
+		if (!includeTest(config, parsedFilePath)) {
 			return;
 		}
 
-		const fileLocation = path.join(currentTemplateLocation, file);
-		const lstat = await fs.promises.lstat(fileLocation);
+		const templateFileLocation = path.join(currentTemplateLocation, file);
+		const lstat = await fs.promises.lstat(templateFileLocation);
 		if (lstat.isDirectory()) {
-			await parseDirectory(baseLocation, filePath, answers, config);
+			await parseDirectory({baseLocation: pathInfo.baseLocation, currentPath: filePath, parsedPath: parsedFilePath}, answers, config);
 		} else if (lstat.isFile()) {
-			const fileData = await fs.promises.readFile(fileLocation, 'utf-8');
+			const fileData = await fs.promises.readFile(templateFileLocation, 'utf-8');
 			const template = handlebars.compile(fileData);
 			const parsed = template(answers);
 
 			// Create file in directory
-			const copyLocation = path.join(process.cwd(), filePath);
-			const parsedCopyLocation = handlebars.compile(copyLocation)(answers);
-			await fs.promises.writeFile(parsedCopyLocation, parsed, {flag: 'w'});
-			console.log(`Copied: ${filePath}`);
+			const copyLocation = path.join(process.cwd(), parsedFilePath);
+			await fs.promises.writeFile(copyLocation, parsed, {flag: 'w'});
+			console.log(`Copied: ${parsedFilePath}`);
 		}
 	});
 }
