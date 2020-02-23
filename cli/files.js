@@ -1,6 +1,7 @@
 const path = require('path');
 const fs = require('fs-extra');
 const handlebars = require('handlebars');
+const minimatch = require('minimatch');
 
 async function getPackageJSON(location) {
 	if (!location) {
@@ -26,12 +27,17 @@ async function getPackageJSON(location) {
 	}
 }
 
-async function parseTemplateFiles(location, answers) {
+async function parseTemplateFiles(location, answers, config) {
 	// Recursively read each of the files in this directory and insert handlebars
-	await parseDirectory(location, './', answers);
+	await parseDirectory(location, './', answers, config);
 }
 
-async function parseDirectory(baseLocation, currentPath, answers) {
+async function parseDirectory(baseLocation, currentPath, answers, config) {
+	// Check if this path has been white/blacklisted
+	if (!includeTest(config, currentPath)) {
+		return;
+	}
+
 	const currentTemplateLocation = path.join(baseLocation, currentPath);
 	const currentCopyLocation = path.join(process.cwd(), currentPath);
 	const parsedCurrentCopyLocation = handlebars.compile(currentCopyLocation)(answers);
@@ -53,11 +59,16 @@ async function parseDirectory(baseLocation, currentPath, answers) {
 
 	// Loop through directory files
 	files.forEach(async file => {
-		const fileLocation = path.join(currentTemplateLocation, file);
+		// Check if file is white/blacklisted
 		const filePath = path.join(currentPath, file);
+		if (!includeTest(config, filePath)) {
+			return;
+		}
+
+		const fileLocation = path.join(currentTemplateLocation, file);
 		const lstat = await fs.promises.lstat(fileLocation);
 		if (lstat.isDirectory()) {
-			await parseDirectory(baseLocation, filePath, answers);
+			await parseDirectory(baseLocation, filePath, answers, config);
 		} else if (lstat.isFile()) {
 			const fileData = await fs.promises.readFile(fileLocation, 'utf-8');
 			const template = handlebars.compile(fileData);
@@ -70,6 +81,36 @@ async function parseDirectory(baseLocation, currentPath, answers) {
 			console.log(`Copied: ${filePath}`);
 		}
 	});
+}
+
+function includeTest(config, path) {
+	const filesList = config.files;
+	const ignoreList = config.ignore;
+
+	if (filesList) {
+		const found = filesList.find(filesListGlob => minimatch(path, filesListGlob, {matchBase: true}));
+		if (!found) {
+			return false;
+		}
+
+		const ignore = ignoreList.find(ignoreGlob => minimatch(ignoreGlob, path, {matchBase: true}));
+		if (ignore) {
+			return false;
+		}
+
+		return true;
+	}
+
+	if (ignoreList) {
+		const ignore = ignoreList.find(ignoreGlob => minimatch(ignoreGlob, path, {matchBase: true}));
+		if (ignore) {
+			return false;
+		}
+
+		return true;
+	}
+
+	return true;
 }
 
 async function copyTemplateFiles(location) {
