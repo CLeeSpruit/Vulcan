@@ -36,6 +36,12 @@ In order to start generatating boilerplate code, a template needs to be created 
 		- patternDescription: (_string_), displays to the user if they fail to meet the pattern requirements
 		- required: (_boolean_), required to create the template
 	- Fields can also just take a string as a shortcut for { description: "some given string", type: string, required: false }
+- **Ignore**
+	- Accepts a list of [glob](https://en.wikipedia.org/wiki/Glob_(programming)) patterns to _not_ include in the template (aka blacklist)
+	- node_modules, .git, package-lock.json not included by default.
+- **Files**
+	- Accepts a list of [glob](https://en.wikipedia.org/wiki/Glob_(programming)) patterns to exclusively include in the template (aka whitelist)
+	- Files will be taken into account first, then the ignore property
 
 #### Example Config
 ```json
@@ -55,7 +61,14 @@ In order to start generatating boilerplate code, a template needs to be created 
 				"description": "URL name of package repo",
 				"required": true
 			}
-		}
+		},
+		"files": [
+			"src",
+			"assets",
+		],
+		"ignore": [
+			"*.test.js"
+		]
 	}
 ```
 
