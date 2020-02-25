@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.com/CassandraSpruit/Vulcan.svg?branch=master)](https://travis-ci.com/CassandraSpruit/Vulcan)
 [![npm](https://img.shields.io/npm/v/@cspruit/vulcan)](https://www.npmjs.com/package/@cspruit/vulcan)
 [![license](https://img.shields.io/github/license/CassandraSpruit/Vulcan)](https://github.com/CassandraSpruit/Vulcan/blob/master/LICENSE)
-[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo)
+[![XO code style](https://img.shields.io/badge/code_style-XO-5ed9c7.svg)](https://github.com/xojs/xo) [![Greenkeeper badge](https://badges.greenkeeper.io/CassandraSpruit/Vulcan.svg)](https://greenkeeper.io/)
 
 # Vulcan
 
