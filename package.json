@@ -29,7 +29,7 @@
 	"author": "Cassandra Spruit",
 	"license": "GPL-3.0-or-later",
 	"devDependencies": {
-		"xo": "0.27.0"
+		"xo": "0.27.1"
 	},
 	"dependencies": {
 		"configstore": "^5.0.1",
