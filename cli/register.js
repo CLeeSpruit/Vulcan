@@ -1,20 +1,19 @@
-const {getPackageJSON} = require('./files');
+const {getTemplateConfig} = require('./files');
 
 async function register(tmplMan) {
-	const pkgJson = await getPackageJSON();
+	const config = await getTemplateConfig();
 
-	if (!pkgJson) {
-		console.log('Error registering template: No package.json found!');
-		return;
-	}
-
-	const config = pkgJson.vulcan;
 	if (!config) {
-		console.log('Error registering template: Vulcan config not found in package.json.');
+		console.log('Error registering template: No config found!');
 		return;
 	}
 
 	const templateName = config.name;
+	if (!templateName) {
+		console.log('Error registering template: No "name" field found in config.');
+		return;
+	}
+
 	if (tmplMan.hasTemplate(templateName)) {
 		console.log(`Error registering template: Template with name ${templateName} already exists.`);
 		return;
