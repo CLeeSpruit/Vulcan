@@ -23,7 +23,12 @@ async function vulcan(cli) {
 		case 'register':
 			return register(tmplMan);
 		case 'create':
-			return create(tmplMan, templateName);
+			if (!templateName) {
+				return cli.showHelp();
+			}
+
+			await register(tmplMan, templateName);
+			return create(templateName);
 		case 'delete':
 			return deleteTemplate(tmplMan, templateName);
 		case 'clear':

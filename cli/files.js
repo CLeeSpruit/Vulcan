@@ -33,6 +33,23 @@ async function getTemplateConfig(location) {
 	return data;
 }
 
+async function writeTemplateConfig(data) {
+	// Get data from config-template
+	const templateConfig = await fs.promises.readFile(path.join(__dirname, '../res/config-template.js'), 'utf-8');
+	const parsed = handlebars.compile(templateConfig)(data);
+
+	await fs.promises.writeFile(path.join(process.cwd(), 'vulcan.config.js'), parsed, {flag: 'w'});
+}
+
+async function prependReadme(data) {
+	// Get readme in directory
+	const existingReadme = await fs.promises.readFile(path.join(process.cwd(), 'README.md'), {encoding: 'utf-8', flag: 'a+'});
+	const forword = await fs.promises.readFile(path.join(__dirname, '../res/prepended-readme-template.md'), 'utf-8');
+	const forwordParsed = handlebars.compile(forword)(data);
+	const readme = forwordParsed + existingReadme;
+	await fs.promises.writeFile(path.join(process.cwd(), 'README.md'), readme, {flag: 'w'});
+}
+
 async function readJsFile(filename, location) {
 	const jsPath = path.join(location, filename);
 	let data;
@@ -160,4 +177,11 @@ async function copyTemplateFiles(location) {
 	await fs.copy(location, process.cwd());
 }
 
-module.exports = {getPackageJSON, getTemplateConfig, parseTemplateFiles, copyTemplateFiles};
+module.exports = {
+	getPackageJSON,
+	getTemplateConfig,
+	writeTemplateConfig,
+	prependReadme,
+	parseTemplateFiles,
+	copyTemplateFiles
+};
