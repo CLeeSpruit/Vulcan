@@ -1,6 +1,6 @@
 const inquirer = require('inquirer');
 const defaultConfig = require('../res/default-config');
-const {getPackageJSON, parseTemplateFiles} = require('./files');
+const {getPackageJSON, getTemplateConfig, parseTemplateFiles} = require('./files');
 
 async function generate(tmplMan, templateName) {
 	const template = tmplMan.getTemplate(templateName);
@@ -16,12 +16,10 @@ async function generate(tmplMan, templateName) {
 	}
 
 	// Fill in the blanks set by the template
-	const templatePkg = await getPackageJSON(template.location);
-	const templateConfig = templatePkg.vulcan;
+	const templateConfig = await getTemplateConfig(template.location);
 	const config = {...defaultConfig, ...templateConfig};
-	const data = templatePkg.vulcan.fields;
 
-	const answers = await askQuestions(data) || {};
+	const answers = await askQuestions(config.fields) || {};
 
 	// Copy files into current directory and parse them
 	await parseTemplateFiles(template.location, answers, config);

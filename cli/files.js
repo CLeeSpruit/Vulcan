@@ -8,9 +8,49 @@ async function getPackageJSON(location) {
 		location = process.cwd();
 	}
 
+	return readJson('package.json', location);
+}
+
+async function getTemplateConfig(location) {
+	if (!location) {
+		location = process.cwd();
+	}
+
+	let data;
+	// Try vulcan.config.js first
+	data = await readJsFile('vulcan.config.js', location);
+
+	// Next is .vulcanrc
+	if (!data) {
+		data = await readJson('.vulcanrc', location);
+	}
+
+	if (!data) {
+		const pkg = await readJson('package.json', location);
+		data = pkg.vulcan;
+	}
+
+	return data;
+}
+
+async function readJsFile(filename, location) {
+	const jsPath = path.join(location, filename);
 	let data;
 	try {
-		data = await fs.promises.readFile(path.join(location, 'package.json'), 'utf-8');
+		data = require(jsPath);
+	} catch (error) {
+		if (error && error.code !== 'ENOENT') {
+			return null;
+		}
+	}
+
+	return data;
+}
+
+async function readJson(filename, location) {
+	let data;
+	try {
+		data = await fs.promises.readFile(path.join(location, filename), 'utf-8');
 	} catch (error) {
 		if (error && error.code !== 'ENOENT') {
 			return null;
@@ -22,9 +62,11 @@ async function getPackageJSON(location) {
 			return JSON.parse(data);
 		}
 	} catch (error) {
-		console.log('Error trying to parse package.json');
+		console.log(`Error trying to parse ${filename}`);
 		console.error(error);
 	}
+
+	return data;
 }
 
 async function parseTemplateFiles(location, answers, config) {
@@ -118,4 +160,4 @@ async function copyTemplateFiles(location) {
 	await fs.copy(location, process.cwd());
 }
 
-module.exports = {getPackageJSON, parseTemplateFiles, copyTemplateFiles};
+module.exports = {getPackageJSON, getTemplateConfig, parseTemplateFiles, copyTemplateFiles};
