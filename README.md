@@ -44,6 +44,8 @@ In order to start generatating boilerplate code, a template needs to be created 
 	- Files will be taken into account first, then the ignore property
 
 #### Example Config
+_Config settings can be separate in vulcan.config.js, .vulcanrc, or in as a field in package.json._
+
 ```json
 	"vulcan": {
 		"name": "cli-utility",
