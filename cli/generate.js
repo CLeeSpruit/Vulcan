@@ -1,30 +1,72 @@
+const url = require('url');
+const path = require('path');
 const inquirer = require('inquirer');
+const git = require('nodegit');
+const ora = require('ora');
+const fs = require('fs-extra');
 const defaultConfig = require('../res/default-config');
-const {getPackageJSON, getTemplateConfig, parseTemplateFiles} = require('./files');
+const {getTemplateConfig, parseTemplateFiles} = require('./files');
 
 async function generate(tmplMan, templateName) {
-	const template = tmplMan.getTemplate(templateName);
-	if (!template) {
-		console.log('Error generating template: No template found with name', templateName);
+	// Check if this has already been generated
+	const tmpl = await getTemplateConfig();
+	if (tmpl) {
+		console.log('Error generating template: vulcan tempalte already generated. Use "link" or "update" command instead.');
 		return;
 	}
 
-	const pkg = await getPackageJSON();
-	if (pkg) {
-		console.log('Error generating template: package.json already exists. Use "link" command instead.');
-		return;
-	}
+	// Check if templateName is url
+	const isUrl = detectUrl(templateName);
+	if (isUrl) {
+		// Generate from URL
+		const tempFolderName = 'vulcan-temp';
+		const spinner = ora(`Fetching repo at ${templateName}`).start();
+		try {
+			await git.Clone(templateName, tempFolderName);
+			spinner.succeed(`Repo found, adding to temporary folder "${tempFolderName}"`);
+		} catch (error) {
+			spinner.fail(`Error generating template from url ${templateName}`);
+			throw error;
+		}
 
+		// Grab config from folder
+		const tempFolderLocation = path.join(process.cwd(), tempFolderName);
+		await generateTemplateFiles(tempFolderLocation);
+
+		// Cleanup temp folder
+		await fs.remove(tempFolderLocation);
+	} else {
+		// Generate from template list
+		const template = tmplMan.getTemplate(templateName);
+		if (!template) {
+			console.log(`Error generating template: No template found with name ${templateName}`);
+			return;
+		}
+
+		return generateTemplateFiles(template.location);
+	}
+}
+
+async function generateTemplateFiles(location) {
 	// Fill in the blanks set by the template
-	const templateConfig = await getTemplateConfig(template.location);
+	const templateConfig = await getTemplateConfig(location);
 	const config = {...defaultConfig, ...templateConfig};
 
 	const answers = await askQuestions(config.fields) || {};
 
 	// Copy files into current directory and parse them
-	await parseTemplateFiles(template.location, answers, config);
+	await parseTemplateFiles(location, answers, config);
 
-	console.log(`${templateName} successfully created. Happy coding!`);
+	console.log(`${templateConfig.name} successfully created. Happy coding!`);
+}
+
+function detectUrl(stringUrl) {
+	try {
+		const parsedUrl = new url.URL(stringUrl);
+		return Boolean(parsedUrl);
+	} catch {
+		return false;
+	}
 }
 
 async function askQuestions(data) {

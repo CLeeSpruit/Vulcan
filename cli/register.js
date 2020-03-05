@@ -1,19 +1,17 @@
 const {getTemplateConfig} = require('./files');
 
-async function register(tmplMan, templateName) {
+async function register(tmplMan) {
+	const config = await getTemplateConfig();
+
+	if (!config) {
+		console.log('Error registering template: No config found!');
+		return;
+	}
+
+	const templateName = config.name;
 	if (!templateName) {
-		const config = await getTemplateConfig();
-
-		if (!config) {
-			console.log('Error registering template: No config found!');
-			return;
-		}
-
-		templateName = config.name;
-		if (!templateName) {
-			console.log('Error registering template: No "name" field found in config.');
-			return;
-		}
+		console.log('Error registering template: No "name" field found in config.');
+		return;
 	}
 
 	if (tmplMan.hasTemplate(templateName)) {

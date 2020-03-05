@@ -27,6 +27,10 @@ async function getTemplateConfig(location) {
 
 	if (!data) {
 		const pkg = await readJson('package.json', location);
+		if (!pkg) {
+			return null;
+		}
+
 		data = pkg.vulcan;
 	}
 
