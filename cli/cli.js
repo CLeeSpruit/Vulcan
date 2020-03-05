@@ -9,6 +9,14 @@ const cli = meow(`
 	Examples
 		$ vulcan generate
 		-- Generates a generic boiler plate code
-`);
+`, {
+	flags: {
+		interact: {
+			type: 'boolean',
+			default: true,
+			alias: 'i'
+		}
+	}
+});
 
 vulcan(cli);

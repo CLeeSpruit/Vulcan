@@ -11,6 +11,7 @@ const {list, view} = require('./list');
 async function vulcan(cli) {
 	const command = cli.input[0];
 	const templateName = cli.input[1];
+	const flags = cli.flags;
 	const tmplMan = new TemplateManager();
 
 	switch (command) {
@@ -19,7 +20,7 @@ async function vulcan(cli) {
 				return cli.showHelp();
 			}
 
-			return generate(tmplMan, templateName);
+			return generate(tmplMan, templateName, flags);
 		case 'register':
 			return register(tmplMan);
 		case 'create':

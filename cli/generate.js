@@ -7,7 +7,7 @@ const fs = require('fs-extra');
 const defaultConfig = require('../res/default-config');
 const {getTemplateConfig, parseTemplateFiles} = require('./files');
 
-async function generate(tmplMan, templateName) {
+async function generate(tmplMan, templateName, flags) {
 	// Check if this has already been generated
 	const tmpl = await getTemplateConfig();
 	if (tmpl) {
@@ -43,16 +43,20 @@ async function generate(tmplMan, templateName) {
 			return;
 		}
 
-		return generateTemplateFiles(template.location);
+		const askQuestions = flags.interact;
+		return generateTemplateFiles(template.location, askQuestions);
 	}
 }
 
-async function generateTemplateFiles(location) {
+async function generateTemplateFiles(location, askQuestions) {
 	// Fill in the blanks set by the template
 	const templateConfig = await getTemplateConfig(location);
 	const config = {...defaultConfig, ...templateConfig};
 
-	const answers = await askQuestions(config.fields) || {};
+	const answers = askQuestions ? await interactiveMode(config.fields) || {} : {};
+	if (!askQuestions && config.fields !== {}) {
+		console.warn(`Warning: ${templateConfig.name} has fields that are not set.`);
+	}
 
 	// Copy files into current directory and parse them
 	await parseTemplateFiles(location, answers, config);
@@ -69,7 +73,7 @@ function detectUrl(stringUrl) {
 	}
 }
 
-async function askQuestions(data) {
+async function interactiveMode(data) {
 	const questions = Object.entries(data).map(entry => {
 		const key = entry[0];
 		const properties = entry[1];
