@@ -120,7 +120,7 @@ async function parseDirectory(pathInfo, answers, config) {
 	}
 
 	// Loop through directory files
-	files.forEach(async file => {
+	return Promise.all(files.map(async file => {
 		const parsedFileName = handlebars.compile(file)(answers);
 		// Check if file is white/blacklisted
 		const filePath = path.join(pathInfo.currentPath, file);
@@ -144,7 +144,7 @@ async function parseDirectory(pathInfo, answers, config) {
 			await fs.promises.writeFile(copyLocation, parsed, {flag: 'w'});
 			console.log(`Copied: ${parsedFilePath}`);
 		}
-	});
+	}));
 }
 
 function includeTest(config, path) {
