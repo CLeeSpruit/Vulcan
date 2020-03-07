@@ -1,29 +1,11 @@
-const path = require('path');
 const {exec} = require('child_process');
 const ora = require('ora');
-const fs = require('fs-extra');
 const git = require('nodegit');
+const {cleanupAll} = require('./clean');
+const {folders} = require('./execute-config');
 
-const registerRepo = 'cli-utility';
-const generateTestFolder = 'generate-from-list';
-const generateUrlTestFolder = 'generate-from-url';
+const configPath = '../integration-tests/existing-config.js';
 const templateUrl = 'https://github.com/CassandraSpruit/Vulcan-CLI-Utility';
-
-const cleanupAll = async spinner => {
-	exec('vulcan clear', printToConsole);
-	const folders = [registerRepo, generateTestFolder, generateUrlTestFolder];
-
-	return Promise.all(folders.map(folder => cleanFolder(spinner, folder)));
-};
-
-const cleanFolder = async (spinner, folderName) => {
-	spinner.text = `Cleaning ${folderName}`;
-	await fs.remove(path.join(process.cwd(), folderName)).catch(error => {
-		spinner.fail(`Error cleaning ${folderName}`);
-		throw error;
-	});
-	spinner.succeed(`Cleaned: ${folderName}`);
-};
 
 const runTest = async (spinner, testLabel, test) => {
 	spinner.text = `Test: ${testLabel}`;
@@ -51,8 +33,8 @@ const printToConsole = (error, stdout, stderr) => {
 };
 
 const register = async () => {
-	await git.Clone(templateUrl, registerRepo);
-	await exec(`cd ${registerRepo} && vulcan register ${registerRepo} && cd ../`, printToConsole);
+	await git.Clone(templateUrl, folders.registerRepo);
+	await exec(`cd ${folders.registerRepo} && vulcan register ${folders.registerRepo} && cd ../`, printToConsole);
 };
 
 const list = async () => {
@@ -60,15 +42,19 @@ const list = async () => {
 };
 
 const view = async () => {
-	await exec(`vulcan view ${registerRepo}`, printToConsole);
+	await exec(`vulcan view ${folders.registerRepo}`, printToConsole);
 };
 
 const generate = async () => {
-	await exec(`mkdir ${generateTestFolder} && cd ${generateTestFolder} && vulcan generate --no-interact ${registerRepo} && cd ../`, printToConsole);
+	await exec(`mkdir ${folders.generateTestFolder} && cd ${folders.generateTestFolder} && vulcan generate --no-interact ${folders.registerRepo} && cd ../`, printToConsole);
 };
 
 const generateUrl = async () => {
-	await exec(`mkdir ${generateUrlTestFolder} && cd ${generateUrlTestFolder} && vulcan generate --no-interact ${templateUrl} && cd ../`, printToConsole);
+	await exec(`mkdir ${folders.generateUrlTestFolder} && cd ${folders.generateUrlTestFolder} && vulcan generate --no-interact ${templateUrl} && cd ../`, printToConsole);
+};
+
+const generateWithConfig = async () => {
+	await exec(`mkdir ${folders.generateWithConfigFolder} && cd ${folders.generateWithConfigFolder} && vulcan generate --no-interact --config=${configPath} ${folders.registerRepo} && cd ../`, printToConsole);
 };
 
 /** *** Start! *****/
@@ -81,8 +67,9 @@ cleanupAll(spinner).then(async () => {
 	await runTest(spinner, 'cmd: View', view);
 	await runTest(spinner, 'cmd: Generate - List', generate);
 	await runTest(spinner, 'cmd: Generate - URL', generateUrl);
+	await runTest(spinner, 'cmd: Generate - Config', generateWithConfig);
 	spinner.succeed('Tests have run, doing final cleanup...');
-	// await cleanupAll(spinner);
+	// Await cleanupAll(spinner);
 }, error => {
 	return error;
 });

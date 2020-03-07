@@ -15,6 +15,11 @@ const cli = meow(`
 			type: 'boolean',
 			default: true,
 			alias: 'i'
+		},
+		config: {
+			type: 'string',
+			default: '',
+			alias: 'c'
 		}
 	}
 });

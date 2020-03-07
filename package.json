@@ -8,7 +8,8 @@
 	"scripts": {
 		"lint": "xo",
 		"lint-fix": "xo --fix",
-		"test": "node ./integration-tests/run-tests.js"
+		"test": "node ./integration-tests/run-tests.js",
+		"test-cleanup": "node ./integration-tests/clean.js"
 	},
 	"repository": {
 		"type": "git",

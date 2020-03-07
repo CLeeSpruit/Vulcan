@@ -8,7 +8,7 @@ async function getPackageJSON(location) {
 		location = process.cwd();
 	}
 
-	return readJson('package.json', location);
+	return readFile(location, 'package.json');
 }
 
 async function getTemplateConfig(location) {
@@ -18,15 +18,15 @@ async function getTemplateConfig(location) {
 
 	let data;
 	// Try vulcan.config.js first
-	data = await readJsFile('vulcan.config.js', location);
+	data = await readFile(location, 'vulcan.config.js');
 
 	// Next is .vulcanrc
 	if (!data) {
-		data = await readJson('.vulcanrc', location);
+		data = await readJson(location, '.vulcanrc');
 	}
 
 	if (!data) {
-		const pkg = await readJson('package.json', location);
+		const pkg = await readFile(location, 'package.json');
 		if (!pkg) {
 			return null;
 		}
@@ -54,7 +54,29 @@ async function prependReadme(data) {
 	await fs.promises.writeFile(path.join(process.cwd(), 'README.md'), readme, {flag: 'w'});
 }
 
-async function readJsFile(filename, location) {
+async function readFile(location, filename) {
+	switch (path.extname(filename)) {
+		case '.json':
+			return readJson(location, filename);
+		case '.js':
+			return readJsFile(location, filename);
+		default:
+			return readTextFile(location, filename);
+	}
+}
+
+async function readTextFile(location, filename) {
+	try {
+		const data = await fs.promises.readFile(path.join(location, filename), 'utf-8');
+		return data;
+	} catch (error) {
+		if (error && error.code !== 'ENOENT') {
+			return null;
+		}
+	}
+}
+
+async function readJsFile(location, filename) {
 	const jsPath = path.join(location, filename);
 	let data;
 	try {
@@ -68,7 +90,7 @@ async function readJsFile(filename, location) {
 	return data;
 }
 
-async function readJson(filename, location) {
+async function readJson(location, filename) {
 	let data;
 	try {
 		data = await fs.promises.readFile(path.join(location, filename), 'utf-8');
@@ -187,5 +209,6 @@ module.exports = {
 	writeTemplateConfig,
 	prependReadme,
 	parseTemplateFiles,
-	copyTemplateFiles
+	copyTemplateFiles,
+	readFile
 };
