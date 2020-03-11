@@ -32,7 +32,7 @@
 	"devDependencies": {
 		"nodegit": "^0.26.5",
 		"ora": "^4.0.3",
-		"xo": "0.27.2"
+		"xo": "0.28.0"
 	},
 	"dependencies": {
 		"configstore": "^5.0.1",
