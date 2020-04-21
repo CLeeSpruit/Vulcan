@@ -31,7 +31,7 @@
 	"license": "GPL-3.0-or-later",
 	"devDependencies": {
 		"nodegit": "^0.26.5",
-		"ora": "^4.0.3",
+		"ora": "^4.0.4",
 		"xo": "0.28.0"
 	},
 	"dependencies": {
