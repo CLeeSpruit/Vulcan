@@ -30,7 +30,6 @@
 	"author": "Cassandra Spruit",
 	"license": "GPL-3.0-or-later",
 	"devDependencies": {
-		"nodegit": "^0.26.5",
 		"ora": "^4.0.3",
 		"xo": "0.28.0"
 	},
@@ -40,6 +39,7 @@
 		"handlebars": "^4.7.3",
 		"inquirer": "^7.0.4",
 		"meow": "^6.0.1",
-		"minimatch": "^3.0.4"
+		"minimatch": "^3.0.4",
+		"nodegit": "^0.26.5"
 	}
 }
