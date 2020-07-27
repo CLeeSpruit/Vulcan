@@ -1,7 +1,7 @@
 const url = require('url');
 const path = require('path');
 const inquirer = require('inquirer');
-const git = require('nodegit');
+const gitClone = require('nodegit').Clone;
 const ora = require('ora');
 const fs = require('fs-extra');
 const defaultConfig = require('../res/default-config');
@@ -33,22 +33,22 @@ async function generate(tmplMan, templateName, flags) {
 	const isUrl = detectUrl(templateName);
 	if (isUrl) {
 		// Generate from URL
-		const tempFolderName = 'vulcan-temp';
+		const temporaryFolderName = 'vulcan-temp';
 		const spinner = ora(`Fetching repo at ${templateName}`).start();
 		try {
-			await git.Clone(templateName, tempFolderName);
-			spinner.succeed(`Repo found, adding to temporary folder "${tempFolderName}"`);
+			await gitClone(templateName, temporaryFolderName);
+			spinner.succeed(`Repo found, adding to temporary folder "${temporaryFolderName}"`);
 		} catch (error) {
 			spinner.fail(`Error generating template from url ${templateName}`);
 			throw error;
 		}
 
 		// Grab config from folder
-		const tempFolderLocation = path.join(process.cwd(), tempFolderName);
-		await generateTemplateFiles(tempFolderLocation, flags);
+		const temporaryFolderLocation = path.join(process.cwd(), temporaryFolderName);
+		await generateTemplateFiles(temporaryFolderLocation, flags);
 
 		// Cleanup temp folder
-		await fs.remove(tempFolderLocation);
+		await fs.remove(temporaryFolderLocation);
 	} else {
 		// Generate from template list
 		const template = tmplMan.getTemplate(templateName);

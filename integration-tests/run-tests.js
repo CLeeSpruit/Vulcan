@@ -1,6 +1,6 @@
 const {exec} = require('child_process');
 const ora = require('ora');
-const git = require('nodegit');
+const gitClone = require('nodegit').Clone;
 const {cleanupAll} = require('./clean');
 const {folders} = require('./execute-config');
 
@@ -33,7 +33,7 @@ const printToConsole = (error, stdout, stderr) => {
 };
 
 const register = async () => {
-	await git.Clone(templateUrl, folders.registerRepo);
+	await gitClone(templateUrl, folders.registerRepo);
 	await exec(`cd ${folders.registerRepo} && vulcan register ${folders.registerRepo} && cd ../`, printToConsole);
 };
 
