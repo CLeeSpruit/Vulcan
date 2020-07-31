@@ -1,6 +1,8 @@
 const {exec} = require('child_process');
 const ora = require('ora');
-const gitClone = require('nodegit').Clone;
+const git = require('isomorphic-git');
+const http = require('isomorphic-git/http/node');
+const fs = require('fs-extra');
 const {cleanupAll} = require('./clean');
 const {folders} = require('./execute-config');
 
@@ -33,8 +35,21 @@ const printToConsole = (error, stdout, stderr) => {
 };
 
 const register = async () => {
-	await gitClone(templateUrl, folders.registerRepo);
-	await exec(`cd ${folders.registerRepo} && vulcan register ${folders.registerRepo} && cd ../`, printToConsole);
+	const folderLocation = './integration-tests/' + folders.registerRepo;
+	await fs.mkdirp(folderLocation);
+	await git.clone({
+		fs,
+		http,
+		url: templateUrl,
+		// TODO: Replace this as this proxy is only meant for testing
+		corsProxy: 'https://cors.isomorphic-git.org',
+		dir: folderLocation,
+		singleBranch: true,
+		depth: 1,
+		noCheckout: true,
+		noTags: true
+	});
+	await exec(`cd ${folderLocation} && vulcan register ${folders.registerRepo} && cd ../`, printToConsole);
 };
 
 const list = async () => {

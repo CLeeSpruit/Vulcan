@@ -1,8 +1,9 @@
 const url = require('url');
 const path = require('path');
-const inquirer = require('inquirer');
-const gitClone = require('nodegit').Clone;
 const ora = require('ora');
+const inquirer = require('inquirer');
+const git = require('isomorphic-git');
+const http = require('isomorphic-git/http/node');
 const fs = require('fs-extra');
 const defaultConfig = require('../res/default-config');
 const {getTemplateConfig, parseTemplateFiles, readFile} = require('./files');
@@ -36,7 +37,17 @@ async function generate(tmplMan, templateName, flags) {
 		const temporaryFolderName = 'vulcan-temp';
 		const spinner = ora(`Fetching repo at ${templateName}`).start();
 		try {
-			await gitClone(templateName, temporaryFolderName);
+			await git.clone({
+				fs, 
+				http, 
+				url: templateName,
+				proxy: 'https://cors.isomorphic-git.org',
+				dir: '/' + temporaryFolderName,
+				singleBranch: true,
+				depth: 1,
+				noCheckout: true,
+				noTags: true
+			});
 			spinner.succeed(`Repo found, adding to temporary folder "${temporaryFolderName}"`);
 		} catch (error) {
 			spinner.fail(`Error generating template from url ${templateName}`);
