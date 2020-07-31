@@ -1,6 +1,6 @@
 {
 	"name": "@cspruit/vulcan",
-	"version": "0.5.0",
+	"version": "0.5.1",
 	"description": "A boilerplate creator and maintainer",
 	"bin": {
 		"vulcan": "cli/cli.js"
